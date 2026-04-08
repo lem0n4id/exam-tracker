@@ -1,5 +1,83 @@
 # exam-tracker
 
+## Setup
+
+### Prerequisites
+
+- **Node.js** `>=18.14.1`
+- **npm** (bundled with Node) — or **pnpm** with `.npmrc` `shamefully-hoist=true` (see [.npmrc](.npmrc))
+
+### Install
+
+```bash
+npm install
+```
+
+### Commands
+
+| Command           | Description                            |
+|-------------------|----------------------------------------|
+| `npm run dev`     | Start dev server at `localhost:3000`   |
+| `npm start`       | Alias for `npm run dev`                |
+| `npm run build`   | Build static site to `dist/`           |
+| `npm run preview` | Preview the production build locally   |
+
+> **Note:** No test script is assumed in `package.json` unless explicitly added.
+
+### Environment notes
+
+| Environment | Caveat |
+|-------------|--------|
+| **pnpm**    | Add `.npmrc` with `shamefully-hoist=true` |
+| **StackBlitz** | Add `.stackblitzrc` with `ENABLE_CJS_IMPORTS=true` and `startCommand: "npm start"` |
+
+---
+
+## Project structure
+
+```
+exam-tracker/
+├── astro.config.mjs          # Astro config — Tailwind v4 via @tailwindcss/vite
+├── tsconfig.json
+├── package.json              # engines: node >=18.14.1
+├── .npmrc                    # shamefully-hoist=true (pnpm)
+├── .stackblitzrc             # ENABLE_CJS_IMPORTS=true, start: npm start
+├── public/
+│   └── simplyCountdown.min.js   # Vendor countdown library (do NOT replace)
+└── src/
+    ├── pages/
+    │   └── index.astro          # Main page (top bar, date anchor, schedule, footer, bottom nav)
+    ├── components/
+    │   └── Schedule.astro       # Exam card list + simplyCountdown bindings
+    └── styles/
+        ├── global.css           # Tailwind v4 @import + @theme design tokens
+        └── home.css             # Page-specific utilities (hard shadows, countdown styles)
+```
+
+### Architecture conventions
+
+- `src/pages` — page composition
+- `src/components` — reusable UI components
+- `src/styles` — global and page-level styles
+- `public` — static browser assets (absolute-path references)
+- Astro component order: **frontmatter → markup → style/script blocks**
+- External browser scripts use `is:inline` where required
+
+### Countdown integration
+
+`public/simplyCountdown.min.js` is the vendor countdown library.  
+Each exam card exposes `data-day`, `data-month`, `data-year` attributes.  
+The client script in `Schedule.astro` reads those attributes, determines the
+urgency state, and initialises `simplyCountdown` per card.  
+Date format for all displays: **dd-mm-yyyy**.
+
+### Visual reference
+
+`stitch/2944944676816621264/668a3253350e441690c92f6971809c95/Exam-Tracker-Deadline-Machine.html`
+is the authoritative visual source of truth for all UI implementation decisions.
+
+---
+
 ## original prompt
 
 ```markdown
