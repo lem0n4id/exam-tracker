@@ -4,9 +4,9 @@
  * Main exam-tracker page.
  *
  * Layout structure (matches Stitch reference Exam-Tracker-Deadline-Machine.html):
- *   1. Fixed top app-bar   — DEADLINE_PROTOCOL title + nav links
- *   2. Date anchor section — system status + today's date (dd-mm-yyyy, client-rendered)
- *   3. Exam card list      — <Schedule /> component
+ *   1. Fixed top app-bar   — <TopBar /> React component
+ *   2. Date anchor section — <DateAnchor /> React component (client:load for date hydration)
+ *   3. Exam card list      — <Schedule /> Astro component
  *   4. Footer              — NO_EXCUSES motto
  *   5. Fixed bottom nav    — mobile navigation bar
  *
@@ -15,6 +15,8 @@
 import '../styles/global.css';
 import '../styles/home.css';
 import Schedule from '../components/Schedule.astro';
+import TopBar from '../components/TopBar';
+import DateAnchor from '../components/DateAnchor';
 ---
 
 <!doctype html>
@@ -40,54 +42,13 @@ import Schedule from '../components/Schedule.astro';
   <body class="bg-background text-on-surface antialiased mb-24">
 
     <!-- ── Top App Bar ──────────────────────────────────────────── -->
-    <header
-      class="fixed top-0 w-full z-50 flex items-center justify-between px-6 py-4
-             bg-background border-b-4 border-white hard-shadow-white"
-    >
-      <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-primary text-2xl">terminal</span>
-        <h1 class="text-2xl font-black text-white tracking-widest font-headline uppercase">
-          DEADLINE_PROTOCOL
-        </h1>
-      </div>
-
-      <div class="flex items-center gap-4">
-        <nav class="hidden md:flex gap-6 font-headline font-bold text-sm tracking-widest uppercase">
-          <a class="text-primary" href="#">Grid</a>
-          <a class="text-white hover:text-primary" href="#">Add</a>
-          <a class="text-white hover:text-primary" href="#">Stats</a>
-          <a class="text-white hover:text-primary" href="#">Meta</a>
-        </nav>
-        <span class="material-symbols-outlined text-white cursor-pointer hover:bg-primary hover:text-black p-1">
-          history_toggle_off
-        </span>
-      </div>
-    </header>
+    <TopBar />
 
     <!-- ── Main content ─────────────────────────────────────────── -->
     <main class="mt-28 px-4 max-w-2xl mx-auto space-y-12">
 
-      <!-- Date Anchor -->
-      <section class="flex justify-between items-end border-b-4 border-outline pb-2">
-        <div>
-          <span class="block text-[10px] font-black uppercase tracking-[0.2em] text-outline">
-            System_Status
-          </span>
-          <span class="text-4xl font-black font-headline tracking-tighter">OPERATIONAL</span>
-        </div>
-        <div class="text-right">
-          <span class="block text-[10px] font-black uppercase tracking-[0.2em] text-outline">
-            Current_Date
-          </span>
-          <span
-            id="today-date"
-            class="text-xl font-mono font-bold text-primary"
-            aria-live="polite"
-          >
-            ──-──-────
-          </span>
-        </div>
-      </section>
+      <!-- Date Anchor — client:load so useEffect fires and populates today's date -->
+      <DateAnchor client:load />
 
       <!-- Exam schedule -->
       <Schedule />
@@ -138,18 +99,6 @@ import Schedule from '../components/Schedule.astro';
         <span class="text-[10px] font-bold font-label uppercase tracking-widest">META</span>
       </div>
     </nav>
-
-    <!-- Populate today's date client-side (dd-mm-yyyy) -->
-    <script is:inline>
-      (function () {
-        var now  = new Date();
-        var day  = String(now.getDate()).padStart(2, '0');
-        var mon  = String(now.getMonth() + 1).padStart(2, '0');
-        var year = now.getFullYear();
-        var el   = document.getElementById('today-date');
-        if (el) el.textContent = day + '-' + mon + '-' + year;
-      })();
-    </script>
 
   </body>
 </html>
