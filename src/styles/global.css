@@ -1,0 +1,111 @@
+/* ============================================================
+   global.css — Tailwind v4 import + design tokens
+   Design system sourced from stitch/…/design-system.json
+   ============================================================ */
+
+@import "tailwindcss";
+
+@theme {
+  /* ── Typography ────────────────────────────────────────── */
+  --font-headline: "Space Grotesk", sans-serif;
+  --font-body:     "Space Grotesk", sans-serif;
+  --font-label:    "Space Grotesk", sans-serif;
+  --font-mono:     "JetBrains Mono", monospace;
+
+  /* ── Border radius — neo-brutalist: hard edges only ──── */
+  --radius:     0rem;
+  --radius-sm:  0rem;
+  --radius-md:  0rem;
+  --radius-lg:  0rem;
+  --radius-xl:  0rem;
+  --radius-2xl: 0rem;
+  --radius-3xl: 0rem;
+  --radius-full: 9999px;
+
+  /* ── Colour palette ──────────────────────────────────── */
+
+  /* Primary — pastel pink */
+  --color-primary:                   #ff85c9;
+  --color-primary-dim:               #f36fbc;
+  --color-primary-container:         #f672be;
+  --color-primary-fixed:             #fd77c4;
+  --color-primary-fixed-dim:         #ed6ab6;
+  --color-on-primary:                #5e0041;
+  --color-on-primary-container:      #490032;
+  --color-on-primary-fixed:          #15000c;
+  --color-on-primary-fixed-variant:  #620045;
+  --color-inverse-primary:           #a52f79;
+
+  /* Secondary — pastel cyan */
+  --color-secondary:                    #8debff;
+  --color-secondary-dim:                #7edcf0;
+  --color-secondary-container:          #006877;
+  --color-secondary-fixed:              #8debff;
+  --color-secondary-fixed-dim:          #7edcf0;
+  --color-on-secondary:                 #005763;
+  --color-on-secondary-container:       #eafbff;
+  --color-on-secondary-fixed:           #00424c;
+  --color-on-secondary-fixed-variant:   #00616f;
+
+  /* Tertiary — pastel yellow-green */
+  --color-tertiary:                    #f9ffb1;
+  --color-tertiary-dim:                #dbe479;
+  --color-tertiary-container:          #eaf385;
+  --color-tertiary-fixed:              #eaf385;
+  --color-tertiary-fixed-dim:          #dbe479;
+  --color-on-tertiary:                 #5d6400;
+  --color-on-tertiary-container:       #555b00;
+  --color-on-tertiary-fixed:           #434800;
+  --color-on-tertiary-fixed-variant:   #5f6600;
+
+  /* Error — warning red */
+  --color-error:              #ff6e84;
+  --color-error-dim:          #d73357;
+  --color-error-container:    #a70138;
+  --color-on-error:           #490013;
+  --color-on-error-container: #ffb2b9;
+
+  /* Surface scale */
+  --color-surface:                   #0e0e0e;
+  --color-surface-dim:               #0e0e0e;
+  --color-surface-bright:            #2c2c2c;
+  --color-surface-variant:           #262626;
+  --color-surface-container:         #1a1a1a;
+  --color-surface-container-low:     #131313;
+  --color-surface-container-lowest:  #000000;
+  --color-surface-container-high:    #20201f;
+  --color-surface-container-highest: #262626;
+  --color-surface-tint:              #ff85c9;
+  --color-on-surface:                #ffffff;
+  --color-on-surface-variant:        #adaaaa;
+  --color-inverse-surface:           #fcf9f8;
+  --color-inverse-on-surface:        #565555;
+
+  /* Background */
+  --color-background:    #0e0e0e;
+  --color-on-background: #ffffff;
+
+  /* Outline */
+  --color-outline:         #767575;
+  --color-outline-variant: #484847;
+}
+
+/* ── Base reset ─────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: max(884px, 100dvh);
+}

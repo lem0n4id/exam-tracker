@@ -1,0 +1,54 @@
+/* ============================================================
+   home.css — page-specific utilities and component overrides
+   ============================================================ */
+
+/* ── Hard-offset shadows (neo-brutalist) ─────────────────── */
+.hard-shadow-primary   { box-shadow: 8px 8px 0px 0px var(--color-primary); }
+.hard-shadow-white     { box-shadow: 4px 4px 0px 0px #ffffff; }
+.hard-shadow-secondary { box-shadow: 8px 8px 0px 0px var(--color-secondary); }
+.hard-shadow-error     { box-shadow: 8px 8px 0px 0px var(--color-error); }
+
+/* ── Material Symbols icon tuning ────────────────────────── */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* ── simplyCountdown section styling ─────────────────────── */
+/* Render Days:Hours:Minutes:Seconds in monospace, hide labels */
+.exam-countdown {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.exam-countdown .simply-section {
+  display: inline-flex;
+  align-items: center;
+}
+
+.exam-countdown .simply-section > div {
+  display: inline-flex;
+  align-items: center;
+}
+
+.exam-countdown .simply-word {
+  display: none;
+}
+
+/* Colon separators between sections */
+.exam-countdown .simply-section:not(:last-child)::after {
+  content: ':';
+  margin: 0 1px;
+}
+
+/* ── Urgency-state card accents ─────────────────────────── */
+.card-far         { --card-accent: var(--color-outline); }
+.card-approaching { --card-accent: var(--color-secondary); }
+.card-critical    { --card-accent: var(--color-primary); }
+.card-urgent      { --card-accent: var(--color-error); }
+.card-today       { --card-accent: var(--color-error); }
+.card-missed      { --card-accent: var(--color-outline); }
