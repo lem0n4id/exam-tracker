@@ -57,14 +57,13 @@ export default function TopBar() {
         </nav>
 
         {/* History toggle affordance */}
-        <span
-          className="material-symbols-outlined text-on-surface cursor-pointer hover:bg-primary hover:text-on-primary p-1"
-          role="button"
-          tabIndex={0}
+        <button
+          className="material-symbols-outlined text-on-surface cursor-pointer hover:bg-primary hover:text-on-primary p-1 bg-transparent border-0"
+          type="button"
           aria-label="Toggle history"
         >
           history_toggle_off
-        </span>
+        </button>
       </div>
     </header>
   );
