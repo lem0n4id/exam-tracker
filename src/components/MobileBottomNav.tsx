@@ -51,12 +51,11 @@ export default function MobileBottomNav() {
             type="button"
             aria-current={isActive ? 'page' : undefined}
             onClick={() => setActiveId(id)}
-            className={[
-              'flex flex-col items-center justify-center w-16 h-16 border-0 bg-transparent cursor-pointer transition-none',
+            className={`flex flex-col items-center justify-center w-16 h-16 border-0 bg-transparent cursor-pointer transition-none ${
               isActive
                 ? 'bg-primary text-black'
-                : 'text-white opacity-50 hover:bg-primary hover:text-black hover:opacity-100 active:translate-y-1',
-            ].join(' ')}
+                : 'text-white opacity-50 hover:bg-primary hover:text-black hover:opacity-100 active:translate-y-1'
+            }`}
           >
             <span className="material-symbols-outlined" aria-hidden="true">
               {icon}
