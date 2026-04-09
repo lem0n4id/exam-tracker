@@ -78,6 +78,51 @@ is the authoritative visual source of truth for all UI implementation decisions.
 
 ---
 
+## GitHub Agent Execution Order
+
+Assign issues to GitHub Copilot in this exact order so dependencies are respected and work can run one issue at a time safely.
+
+### Epic Order
+
+1. Epic: Astro Tailwind Foundation - Issue #3
+  https://github.com/lem0n4id/exam-tracker/issues/3
+2. Epic: Deadline Machine Shell - Issue #5
+  https://github.com/lem0n4id/exam-tracker/issues/5
+3. Epic: Countdown Logic Engine - Issue #2
+  https://github.com/lem0n4id/exam-tracker/issues/2
+4. Epic: Urgency State Rendering - Issue #4
+  https://github.com/lem0n4id/exam-tracker/issues/4
+5. Epic: Quality and Release Operations - Issue #1
+  https://github.com/lem0n4id/exam-tracker/issues/1
+
+### Feature Order (One by One)
+
+1. Feature: Astro Tailwind Latest Bootstrap - Issue #10
+  https://github.com/lem0n4id/exam-tracker/issues/10
+2. Feature: Top Bar and Date Anchor - Issue #9
+  https://github.com/lem0n4id/exam-tracker/issues/9
+3. Feature: Footer and Mobile Navigation - Issue #6
+  https://github.com/lem0n4id/exam-tracker/issues/6
+4. Feature: Exam Data Contract - Issue #11
+  https://github.com/lem0n4id/exam-tracker/issues/11
+5. Feature: Countdown and State Transition Engine - Issue #12
+  https://github.com/lem0n4id/exam-tracker/issues/12
+6. Feature: Active Urgency Cards (D-5, D-2, D-1) - Issue #8
+  https://github.com/lem0n4id/exam-tracker/issues/8
+7. Feature: Today and Missed Overrides - Issue #7
+  https://github.com/lem0n4id/exam-tracker/issues/7
+8. Feature: Visual Regression and Responsive QA - Issue #14
+  https://github.com/lem0n4id/exam-tracker/issues/14
+9. Feature: Deployment Playbook and Handoff - Issue #13
+  https://github.com/lem0n4id/exam-tracker/issues/13
+
+### Assignment Rule for GitHub Copilot
+
+1. Assign only the current issue in the sequence.
+2. Wait for Copilot to open and complete the linked PR.
+3. Review and merge that PR.
+4. Then assign the next issue.
+
 ## original prompt
 
 ```markdown
