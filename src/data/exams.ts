@@ -86,10 +86,14 @@ export interface Exam {
 /**
  * EXAMS — hardcoded exam list for the current deployment cycle.
  *
- * States set to 'far' because all exams are >7 days from deployment date
- * (deployment: 2026-04-10; exams: May 2026).
- * The runtime urgency engine in Schedule.astro recomputes the live state
- * from examDateISO each page load, so this field stays accurate.
+ * All five exams fall in May 2026; the deployment date is 2026-04-10.
+ * Day deltas at deployment: Calculus III 30 d, Linear Algebra 34 d,
+ * Quantum Mechanics 35 d, Advanced Thermodynamics 36 d, Stochastic Processes 39 d.
+ * Every exam exceeds the 7-day "far" threshold, so all five records are
+ * initialised with `accentState: 'far'`.  No sub-banding within the far
+ * category exists — the runtime urgency engine in Schedule.astro recomputes
+ * the live AccentState from `examDateISO` on each page load, so the rendered
+ * card always reflects the current band regardless of this seed value.
  */
 export const EXAMS: readonly Exam[] = [
   {
