@@ -5,196 +5,23 @@
  *
  * Architecture:
  *  - Frontmatter: imports hardcoded exam data from src/data/exams.ts (data contract).
- *  - Markup: renders exam cards with data attributes for client-side hydration.
- *  - Script: initialises simplyCountdown per card and applies urgency state classes.
+ *  - Markup: renders one ExamCard React island per exam.
+ *  - Each ExamCard runs a per-second countdown via useCountdown and
+ *    renders the correct urgency-state variant (far/approaching/critical/
+ *    last24/today/missed) from the client-side countdown engine.
  *
  * Date format convention: DD-MM-YYYY for all displayed dates (examDateDisplay field).
- * Countdown library: /simplyCountdown.min.js (preserved from public/; do NOT replace).
+ * Countdown engine: src/lib/countdown.ts + src/hooks/useCountdown.ts
  * Data contract: src/data/exams.ts — update EXAMS array each deployment cycle.
  * Visual reference: stitch/…/Exam-Tracker-Deadline-Machine.html
  */
 
 import { EXAMS } from '../data/exams';
-
-/** Parse an ISO date string (YYYY-MM-DD) into day/month/year integers. */
-function parseISO(iso: string): { day: number; month: number; year: number } {
-  const [year, month, day] = iso.split('-').map(Number);
-  return { day, month, year };
-}
+import ExamCard from './ExamCard';
 ---
 
 <div class="space-y-10">
-  {EXAMS.map((exam) => {
-    const { day, month, year } = parseISO(exam.examDateISO);
-    return (
-      <div
-        class="exam-card"
-        id={`card-${exam.id}`}
-        data-day={day}
-        data-month={month}
-        data-year={year}
-        data-subject={exam.subjectName}
-        data-id={exam.id}
-      >
-        {/* Card body — classes and inner content injected by client script */}
-        <div class="card-inner bg-surface-container border-4 border-outline p-6 relative">
-          {/* Urgency badge — top-right corner */}
-          <div class="urgency-badge absolute top-0 right-0 px-4 py-2 font-black font-headline border-l-4 border-b-4 hidden"></div>
-
-          {/* Subject & date */}
-          <div class="mt-2">
-            <span class="urgency-label block text-[10px] font-bold tracking-[0.3em] uppercase mb-1"></span>
-            <h2 class="text-3xl font-black font-headline leading-tight">{exam.subjectName}</h2>
-            <p class="font-mono text-sm text-outline mt-1">
-              TARGET: {exam.examDateDisplay}
-            </p>
-          </div>
-
-          {/* Countdown or status display */}
-          <div class="mt-6 countdown-wrapper">
-            {/* simplyCountdown target — used for active exams */}
-            <div
-              class={`countdown-${exam.id} exam-countdown font-mono text-4xl font-black`}
-            ></div>
-            {/* Status label for TODAY / MISSED states */}
-            <div class="status-label hidden font-mono text-3xl font-black tracking-tighter"></div>
-          </div>
-        </div>
-      </div>
-    );
-  })}
+  {EXAMS.map((exam) => (
+    <ExamCard exam={exam} client:load />
+  ))}
 </div>
-
-<!-- simplyCountdown vendor library (public/simplyCountdown.min.js) -->
-<script is:inline src="/simplyCountdown.min.js"></script>
-
-<script is:inline>
-  /**
-   * Client-side urgency state engine + simplyCountdown initialisation.
-   *
-   * Urgency thresholds (days until exam at midnight):
-   *   MISSED       < 0
-   *   TODAY        = 0
-   *   LAST 24 HRS  > 0 and <= 1
-   *   CRITICAL     > 1 and <= 3
-   *   APPROACHING  > 3 and <= 7
-   *   FAR          > 7
-   */
-  (function () {
-    /** Compute whole-day difference: positive = future, negative = past. */
-    function daysUntil(year, month, day) {
-      var now  = new Date();
-      var exam = new Date(year, month - 1, day, 0, 0, 0, 0);
-      var todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-      return Math.round((exam - todayMidnight) / 86400000);
-    }
-
-    var cards = document.querySelectorAll('.exam-card');
-
-    cards.forEach(function (card) {
-      var day   = parseInt(card.dataset.day,   10);
-      var month = parseInt(card.dataset.month, 10);
-      var year  = parseInt(card.dataset.year,  10);
-      var id    = card.dataset.id;
-
-      var days   = daysUntil(year, month, day);
-      var inner  = card.querySelector('.card-inner');
-      var badge  = card.querySelector('.urgency-badge');
-      var label  = card.querySelector('.urgency-label');
-      var cdEl   = card.querySelector('.countdown-' + id);
-      var status = card.querySelector('.status-label');
-
-      if (days < 0) {
-        /* ── MISSED ─────────────────────────────────────── */
-        inner.classList.remove('border-outline');
-        inner.classList.add('border-outline', 'opacity-60', 'grayscale', 'bg-surface-container-low');
-        label.textContent = '';
-        badge.textContent = 'MISSED';
-        badge.classList.remove('hidden');
-        badge.classList.add('bg-outline', 'text-surface', 'text-xs', 'border-outline');
-        cdEl.classList.add('hidden');
-        status.classList.add('hidden');
-
-      } else if (days === 0) {
-        /* ── TODAY ───────────────────────────────────────── */
-        inner.classList.remove('bg-surface-container', 'border-outline');
-        inner.classList.add('bg-on-surface', 'text-surface', 'border-on-surface');
-        label.textContent = '';
-
-        badge.textContent = 'TODAY';
-        badge.classList.remove('hidden');
-        badge.classList.add('bg-error', 'text-on-error', 'text-xl', 'border-on-surface', '-top-6', 'left-4', 'right-auto');
-
-        cdEl.classList.add('hidden');
-        status.textContent = 'COMMENCING_NOW';
-        status.classList.remove('hidden');
-
-      } else if (days <= 1) {
-        /* ── LAST 24 HOURS ────────────────────────────────── */
-        inner.classList.remove('bg-surface-container', 'border-outline');
-        inner.classList.add('bg-surface-container', 'border-error', 'hard-shadow-error');
-        label.textContent  = 'Urgency: Critical';
-        label.style.color  = 'var(--color-error)';
-        badge.textContent  = 'D-1';
-        badge.classList.remove('hidden');
-        badge.classList.add('bg-error', 'text-on-error', 'border-error');
-        cdEl.classList.add('text-white');
-        initCountdown(cdEl, year, month, day);
-
-      } else if (days <= 3) {
-        /* ── CRITICAL ────────────────────────────────────── */
-        inner.classList.remove('bg-surface-container', 'border-outline');
-        inner.classList.add('bg-surface-container', 'border-primary', 'hard-shadow-primary');
-        label.textContent = 'Urgency: High';
-        label.style.color = 'var(--color-primary)';
-        badge.textContent = 'D-' + days;
-        badge.classList.remove('hidden');
-        badge.classList.add('bg-primary', 'text-on-primary-fixed', 'border-primary');
-        cdEl.classList.add('text-primary');
-        initCountdown(cdEl, year, month, day);
-
-      } else if (days <= 7) {
-        /* ── APPROACHING ─────────────────────────────────── */
-        inner.classList.remove('bg-surface-container', 'border-outline');
-        inner.classList.add('bg-surface-container', 'border-secondary', 'hard-shadow-secondary');
-        label.textContent = 'Urgency: Stable';
-        label.style.color = 'var(--color-secondary)';
-        badge.textContent = 'D-' + days;
-        badge.classList.remove('hidden');
-        badge.classList.add('bg-secondary', 'text-on-secondary', 'border-secondary');
-        cdEl.classList.add('text-secondary');
-        initCountdown(cdEl, year, month, day);
-
-      } else {
-        /* ── FAR ─────────────────────────────────────────── */
-        inner.classList.remove('border-outline');
-        inner.classList.add('border-outline-variant');
-        label.textContent = 'Urgency: Low';
-        label.style.color = 'var(--color-outline)';
-        badge.textContent = 'D-' + days;
-        badge.classList.remove('hidden');
-        badge.classList.add('bg-surface-variant', 'text-on-surface-variant', 'border-outline-variant', 'text-sm');
-        cdEl.classList.add('text-on-surface-variant');
-        initCountdown(cdEl, year, month, day);
-      }
-    });
-
-    /** Initialise simplyCountdown on a target element. */
-    function initCountdown(el, year, month, day) {
-      if (typeof simplyCountdown !== 'function') return;
-      simplyCountdown(el, {
-        year:    year,
-        month:   month,
-        day:     day,
-        hours:   0,
-        minutes: 0,
-        seconds: 0,
-        zeroPad: true,
-        onEnd:   function () {
-          /* Reload so urgency state updates to TODAY/MISSED on day change. */
-          window.location.reload();
-        },
-      });
-    }
-  })();
-</script>
