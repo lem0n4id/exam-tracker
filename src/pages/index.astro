@@ -17,6 +17,8 @@ import '../styles/home.css';
 import Schedule from '../components/Schedule.astro';
 import TopBar from '../components/TopBar';
 import DateAnchor from '../components/DateAnchor';
+import FooterBlock from '../components/FooterBlock';
+import MobileBottomNav from '../components/MobileBottomNav';
 ---
 
 <!doctype html>
@@ -54,51 +56,12 @@ import DateAnchor from '../components/DateAnchor';
       <Schedule />
 
       <!-- Footer -->
-      <section class="border-t-8 border-white pt-6 pb-12">
-        <h3 class="text-6xl font-black font-headline italic tracking-tighter uppercase leading-none">
-          NO_EXCUSES
-        </h3>
-        <p class="font-mono text-outline mt-4 text-xs max-w-xs uppercase leading-relaxed">
-          Time is a finite physical resource. Every second spent in hesitation
-          is a secondary loss of intellectual potential.
-        </p>
-      </section>
+      <FooterBlock />
 
     </main>
 
     <!-- ── Bottom Navigation (mobile) ──────────────────────────── -->
-    <nav
-      class="fixed bottom-0 w-full z-50 flex justify-around items-center h-20 px-4
-             bg-background border-t-4 border-white
-             shadow-[0px_-4px_0px_0px_rgba(255,121,198,1)] md:hidden"
-      aria-label="Main navigation"
-    >
-      <div class="flex flex-col items-center justify-center bg-primary text-black w-16 h-16">
-        <span class="material-symbols-outlined">grid_view</span>
-        <span class="text-[10px] font-bold font-label uppercase tracking-widest">GRID</span>
-      </div>
-      <div
-        class="flex flex-col items-center justify-center text-white opacity-50
-               hover:bg-primary hover:text-black w-16 h-16 active:translate-y-1"
-      >
-        <span class="material-symbols-outlined">add_box</span>
-        <span class="text-[10px] font-bold font-label uppercase tracking-widest">ADD</span>
-      </div>
-      <div
-        class="flex flex-col items-center justify-center text-white opacity-50
-               hover:bg-primary hover:text-black w-16 h-16 active:translate-y-1"
-      >
-        <span class="material-symbols-outlined">analytics</span>
-        <span class="text-[10px] font-bold font-label uppercase tracking-widest">STATS</span>
-      </div>
-      <div
-        class="flex flex-col items-center justify-center text-white opacity-50
-               hover:bg-primary hover:text-black w-16 h-16 active:translate-y-1"
-      >
-        <span class="material-symbols-outlined">settings</span>
-        <span class="text-[10px] font-bold font-label uppercase tracking-widest">META</span>
-      </div>
-    </nav>
+    <MobileBottomNav client:load />
 
   </body>
 </html>
