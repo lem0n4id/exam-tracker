@@ -149,8 +149,10 @@ export interface ValidationResult {
  *
  * Edge cases handled:
  *  - Missing or empty required fields
- *  - examDateISO format (YYYY-MM-DD)
- *  - examDateDisplay format (DD-MM-YYYY)
+ *  - id must match /^[A-Za-z0-9_-]+$/ (safe identifier characters only)
+ *  - examDateISO format (YYYY-MM-DD) and valid calendar date
+ *  - examDateDisplay format (DD-MM-YYYY), valid calendar date, and
+ *    cross-checked to match examDateISO
  *  - accentState not in allowed set
  *  - optionalProgressRatio outside [0, 1]
  *
@@ -159,9 +161,12 @@ export interface ValidationResult {
 export function validateExam(exam: Partial<Exam>): ValidationResult {
   const errors: string[] = [];
 
-  // id
-  if (!exam.id || typeof exam.id !== 'string' || exam.id.trim() === '') {
-    errors.push('id: required, must be a non-empty string (e.g. "exam-1")');
+  // id — must be a non-empty safe-identifier string (letters, digits, _ or -)
+  const idPattern = /^[A-Za-z0-9_-]+$/;
+  if (!exam.id || typeof exam.id !== 'string' || !idPattern.test(exam.id)) {
+    errors.push(
+      'id: required, must be a non-empty string containing only letters, digits, underscores, or hyphens (e.g. "exam-1")',
+    );
   }
 
   // subjectName
@@ -184,12 +189,32 @@ export function validateExam(exam: Partial<Exam>): ValidationResult {
     }
   }
 
-  // examDateDisplay — expect DD-MM-YYYY
+  // examDateDisplay — expect DD-MM-YYYY, valid calendar date, consistent with examDateISO
   const displayPattern = /^\d{2}-\d{2}-\d{4}$/;
   if (!exam.examDateDisplay || !displayPattern.test(exam.examDateDisplay)) {
     errors.push(
       'examDateDisplay: required, must match DD-MM-YYYY (e.g. "16-05-2026")',
     );
+  } else {
+    const [dd, mm, yyyy] = exam.examDateDisplay.split('-').map(Number);
+    const parsedDisplay = new Date(yyyy, mm - 1, dd);
+    const displayIsValid =
+      !isNaN(parsedDisplay.getTime()) &&
+      parsedDisplay.getFullYear() === yyyy &&
+      parsedDisplay.getMonth() + 1 === mm &&
+      parsedDisplay.getDate() === dd;
+
+    if (!displayIsValid) {
+      errors.push('examDateDisplay: value is not a valid calendar date');
+    } else if (exam.examDateISO && isoPattern.test(exam.examDateISO)) {
+      // Cross-check: both fields must refer to the same calendar date.
+      const [isoYear, isoMonth, isoDay] = exam.examDateISO.split('-').map(Number);
+      if (dd !== isoDay || mm !== isoMonth || yyyy !== isoYear) {
+        errors.push(
+          'examDateDisplay does not match examDateISO: both fields must represent the same calendar date',
+        );
+      }
+    }
   }
 
   // accentState
@@ -219,15 +244,16 @@ export function validateExam(exam: Partial<Exam>): ValidationResult {
 }
 
 /**
- * validateAllExams runs validateExam over every record in an array and
- * throws an Error listing all failures. Call during development or
- * pre-release checks.
+ * validateAllExams runs validateExam over every record in an array, checks for
+ * duplicate ids across the batch, and throws an Error listing all failures.
+ * Call during development or pre-release checks.
  *
  * @param exams - Array of Exam records to validate.
- * @throws Error if any record is invalid.
+ * @throws Error if any record is invalid or any id is duplicated.
  */
 export function validateAllExams(exams: readonly Partial<Exam>[]): void {
   const allErrors: string[] = [];
+  const seenIds = new Set<string>();
 
   exams.forEach((exam, index) => {
     const result = validateExam(exam);
@@ -235,6 +261,17 @@ export function validateAllExams(exams: readonly Partial<Exam>[]): void {
       allErrors.push(
         `Record ${index} (id: ${exam.id ?? '<missing>'}): ${result.errors.join('; ')}`,
       );
+    }
+
+    // Uniqueness check — runs even when the record is otherwise valid
+    if (exam.id && typeof exam.id === 'string') {
+      if (seenIds.has(exam.id)) {
+        allErrors.push(
+          `Record ${index} (id: ${exam.id}): id must be unique; this id is already used by an earlier record`,
+        );
+      } else {
+        seenIds.add(exam.id);
+      }
     }
   });
 

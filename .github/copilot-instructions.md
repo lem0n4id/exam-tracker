@@ -16,6 +16,7 @@
 - Prioritize reusable page sections/components once implementation files are added.
 
 ## Build and Test
+
 - `npm run dev` (port 3000), `npm run build` (astro build), `npm run preview`.
 - Requires Node >=18.14.1.
 - No automated test runner yet; run the validation checklist in DEVELOPMENT.md for data contract checks.
