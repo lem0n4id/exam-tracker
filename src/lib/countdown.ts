@@ -121,10 +121,30 @@ export function computeCountdown(
   examDateISO: string,
   now: Date = new Date(),
 ): CountdownResult {
-  const [year, month, day] = examDateISO.split('-').map(Number);
+  // Validate examDateISO format before parsing
+  const isoPattern = /^\d{4}-\d{2}-\d{2}$/;
+  if (!isoPattern.test(examDateISO)) {
+    throw new Error(`Invalid examDateISO: "${examDateISO}" — expected YYYY-MM-DD`);
+  }
+
+  const parts = examDateISO.split('-').map(Number);
+  if (parts.some(isNaN)) {
+    throw new Error(`Invalid examDateISO: "${examDateISO}" — non-numeric parts`);
+  }
+
+  const [year, month, day] = parts;
+  if (month < 1 || month > 12) {
+    throw new Error(`Invalid examDateISO: "${examDateISO}" — month must be 1–12`);
+  }
+  if (day < 1 || day > 31) {
+    throw new Error(`Invalid examDateISO: "${examDateISO}" — day must be 1–31`);
+  }
 
   // Exam deadline: local midnight at the start of the exam day
   const examMidnight = new Date(year, month - 1, day, 0, 0, 0, 0);
+  if (isNaN(examMidnight.getTime())) {
+    throw new Error(`Invalid examDateISO: "${examDateISO}" — does not resolve to a valid calendar date`);
+  }
 
   // Today's local midnight (for whole-day delta)
   const todayMidnight = new Date(
