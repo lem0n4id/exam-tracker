@@ -18,7 +18,7 @@ const FOOTER_MICROCOPY =
 
 export default function FooterBlock() {
   return (
-    <section className="border-t-8 border-white pt-6 pb-12">
+    <section className="border-t-8 border-on-surface pt-6 pb-12">
       <h3 className="text-6xl font-black font-headline italic tracking-tighter uppercase leading-none">
         NO_EXCUSES
       </h3>

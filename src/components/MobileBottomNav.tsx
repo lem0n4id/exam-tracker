@@ -39,8 +39,8 @@ export default function MobileBottomNav() {
   return (
     <nav
       className="fixed bottom-0 w-full z-50 flex justify-around items-center h-20 px-4
-                 bg-background border-t-4 border-white
-                 shadow-[0px_-4px_0px_0px_rgba(255,121,198,1)] md:hidden"
+                 bg-background border-t-4 border-on-surface
+                 shadow-[0px_-4px_0px_0px_var(--color-primary)] md:hidden"
       aria-label="Main navigation"
     >
       {NAV_ITEMS.map(({ id, label, icon }) => {
@@ -53,8 +53,8 @@ export default function MobileBottomNav() {
             onClick={() => setActiveId(id)}
             className={`flex flex-col items-center justify-center w-16 h-16 border-0 bg-transparent cursor-pointer transition-none ${
               isActive
-                ? 'bg-primary text-black'
-                : 'text-white opacity-50 hover:bg-primary hover:text-black hover:opacity-100 active:translate-y-1'
+                ? 'bg-primary text-on-primary'
+                : 'text-on-surface opacity-50 hover:bg-primary hover:text-on-primary hover:opacity-100 active:translate-y-1'
             }`}
           >
             <span className="material-symbols-outlined" aria-hidden="true">
