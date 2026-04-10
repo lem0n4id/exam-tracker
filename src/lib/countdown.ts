@@ -62,6 +62,13 @@ export interface CountdownResult {
  *
  * Accepts pre-computed values so this function stays pure and unit-testable.
  *
+ * The `last24` state applies when the exam is the next calendar day
+ * (daysUntil === 1) OR when actual seconds remaining are already below the
+ * 24-hour mark (e.g. after a day boundary crosses during a live session).
+ * Using both conditions prevents a one-second flicker at exactly midnight
+ * where 86 400 s would otherwise fall into 'critical' before immediately
+ * dropping into 'last24'.
+ *
  * @param daysUntil              Whole-day delta (exam_midnight − today_midnight).
  * @param totalSecondsRemaining  Actual seconds from now until exam midnight.
  */
@@ -71,7 +78,8 @@ export function evaluateState(
 ): AccentState {
   if (daysUntil === 0) return 'today';
   if (daysUntil < 0) return 'missed';
-  if (totalSecondsRemaining > 0 && totalSecondsRemaining < 86400) return 'last24';
+  if (daysUntil === 1 || (totalSecondsRemaining > 0 && totalSecondsRemaining < 86400))
+    return 'last24';
   if (daysUntil <= 3) return 'critical';
   if (daysUntil <= 7) return 'approaching';
   return 'far';
@@ -101,7 +109,9 @@ export function formatSegments(totalSecondsRemaining: number): CountdownSegments
  * computeCountdown — top-level countdown computation for one exam.
  *
  * All time arithmetic is in local wall-clock time; the exam deadline is treated
- * as midnight (00:00:00) on the exam date in the user's local timezone.
+ * as the start of the exam day (00:00:00 local time). Counting down to the
+ * beginning of the exam date means the timer reaches zero at the moment the
+ * exam date begins in the user's timezone.
  *
  * @param examDateISO  ISO-8601 date string (YYYY-MM-DD).
  * @param now          Override for current time — enables deterministic tests.

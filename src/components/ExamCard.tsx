@@ -98,6 +98,9 @@ function Last24Countdown({ days, hours, minutes, seconds }: CountdownDisplayProp
         <span>{pad(hours)}</span>
         <span className="animate-pulse">:</span>
         <span>{pad(minutes)}</span>
+        {/* Intentionally smaller: matches Stitch reference where the colon
+            before seconds visually bridges the larger timer to the smaller
+            seconds unit (text-2xl vs text-4xl). */}
         <span className="animate-pulse text-xs">:</span>
         <span className="text-2xl">{pad(seconds)}</span>
       </div>
@@ -147,7 +150,6 @@ function TodayCard({ exam }: { exam: Exam }) {
         </h2>
         <div className="flex justify-between items-center">
           <span className="font-mono text-lg font-bold">{exam.examDateDisplay}</span>
-          {/* eslint-disable-next-line react/no-unknown-property */}
           <span
             className="material-symbols-outlined text-4xl"
             style={{ fontVariationSettings: "'FILL' 1" }}
