@@ -42,9 +42,12 @@ exam-tracker/
 ├── package.json              # engines: node >=18.14.1
 ├── .npmrc                    # shamefully-hoist=true (pnpm)
 ├── .stackblitzrc             # ENABLE_CJS_IMPORTS=true, start: npm start
+├── DEVELOPMENT.md            # Exam data contract docs + validation checklist
 ├── public/
 │   └── simplyCountdown.min.js   # Vendor countdown library (do NOT replace)
 └── src/
+    ├── data/
+    │   └── exams.ts             # Exam data contract (Exam type, EXAMS array, validators)
     ├── pages/
     │   └── index.astro          # Main page (top bar, date anchor, schedule, footer, bottom nav)
     ├── components/
@@ -63,13 +66,27 @@ exam-tracker/
 - Astro component order: **frontmatter → markup → style/script blocks**
 - External browser scripts use `is:inline` where required
 
+### Exam data contract
+
+All exam records are defined in **`src/data/exams.ts`**.  
+The file exports:
+
+- `Exam` interface — required fields (`id`, `subjectName`, `examDateISO`, `examDateDisplay`, `accentState`) and optional fields (`optionalProgressRatio`).
+- `AccentState` type — allowed urgency values: `far | approaching | critical | last24 | today | missed`.
+- `EXAMS` — hardcoded array for the current deployment cycle.
+- `validateExam` / `validateAllExams` — runtime validation helpers.
+
+Update `EXAMS` at the start of each deployment cycle and run the pre-release
+validation checklist documented in [DEVELOPMENT.md](DEVELOPMENT.md).
+
 ### Countdown integration
 
 `public/simplyCountdown.min.js` is the vendor countdown library.  
-Each exam card exposes `data-day`, `data-month`, `data-year` attributes.  
+Each exam card exposes `data-day`, `data-month`, `data-year` attributes
+(derived from `examDateISO` in the data contract).  
 The client script in `Schedule.astro` reads those attributes, determines the
 urgency state, and initialises `simplyCountdown` per card.  
-Date format for all displays: **dd-mm-yyyy**.
+Date format for all displays: **DD-MM-YYYY** (`examDateDisplay` field).
 
 ### Visual reference
 

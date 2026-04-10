@@ -4,79 +4,65 @@
  * Core exam schedule component.
  *
  * Architecture:
- *  - Frontmatter: hardcoded exam data for the current deployment cycle.
+ *  - Frontmatter: imports hardcoded exam data from src/data/exams.ts (data contract).
  *  - Markup: renders exam cards with data attributes for client-side hydration.
  *  - Script: initialises simplyCountdown per card and applies urgency state classes.
  *
- * Date format convention: dd-mm-yyyy for all displayed dates.
+ * Date format convention: DD-MM-YYYY for all displayed dates (examDateDisplay field).
  * Countdown library: /simplyCountdown.min.js (preserved from public/; do NOT replace).
+ * Data contract: src/data/exams.ts — update EXAMS array each deployment cycle.
  * Visual reference: stitch/…/Exam-Tracker-Deadline-Machine.html
  */
 
-interface Exam {
-  id: string;
-  subject: string;
-  day: number;
-  month: number;
-  year: number;
-}
+import { EXAMS } from '../data/exams';
 
-/** Hardcoded exam data — update per deployment cycle. */
-const exams: Exam[] = [
-  { id: 'exam-1', subject: 'Advanced Thermodynamics', day: 16, month: 5, year: 2026 },
-  { id: 'exam-2', subject: 'Quantum Mechanics',       day: 15, month: 5, year: 2026 },
-  { id: 'exam-3', subject: 'Linear Algebra',          day: 14, month: 5, year: 2026 },
-  { id: 'exam-4', subject: 'Stochastic Processes',    day: 19, month: 5, year: 2026 },
-  { id: 'exam-5', subject: 'Calculus III',            day: 10, month: 5, year: 2026 },
-];
-
-/** Format a date as dd-mm-yyyy. */
-function formatDate(day: number, month: number, year: number): string {
-  return [
-    String(day).padStart(2, '0'),
-    String(month).padStart(2, '0'),
-    String(year),
-  ].join('-');
+/** Parse an ISO date string (YYYY-MM-DD) into day/month/year integers. */
+function parseISO(iso: string): { day: number; month: number; year: number } {
+  const [year, month, day] = iso.split('-').map(Number);
+  return { day, month, year };
 }
 ---
 
 <div class="space-y-10">
-  {exams.map((exam) => (
-    <div
-      class="exam-card"
-      id={`card-${exam.id}`}
-      data-day={exam.day}
-      data-month={exam.month}
-      data-year={exam.year}
-      data-subject={exam.subject}
-      data-id={exam.id}
-    >
-      {/* Card body — classes and inner content injected by client script */}
-      <div class="card-inner bg-surface-container border-4 border-outline p-6 relative">
-        {/* Urgency badge — top-right corner */}
-        <div class="urgency-badge absolute top-0 right-0 px-4 py-2 font-black font-headline border-l-4 border-b-4 hidden"></div>
+  {EXAMS.map((exam) => {
+    const { day, month, year } = parseISO(exam.examDateISO);
+    return (
+      <div
+        class="exam-card"
+        id={`card-${exam.id}`}
+        data-day={day}
+        data-month={month}
+        data-year={year}
+        data-subject={exam.subjectName}
+        data-id={exam.id}
+      >
+        {/* Card body — classes and inner content injected by client script */}
+        <div class="card-inner bg-surface-container border-4 border-outline p-6 relative">
+          {/* Urgency badge — top-right corner */}
+          <div class="urgency-badge absolute top-0 right-0 px-4 py-2 font-black font-headline border-l-4 border-b-4 hidden"></div>
 
-        {/* Subject & date */}
-        <div class="mt-2">
-          <span class="urgency-label block text-[10px] font-bold tracking-[0.3em] uppercase mb-1"></span>
-          <h2 class="text-3xl font-black font-headline leading-tight">{exam.subject}</h2>
-          <p class="font-mono text-sm text-outline mt-1">
-            TARGET: {formatDate(exam.day, exam.month, exam.year)}
-          </p>
-        </div>
+          {/* Subject & date */}
+          <div class="mt-2">
+            <span class="urgency-label block text-[10px] font-bold tracking-[0.3em] uppercase mb-1"></span>
+            <h2 class="text-3xl font-black font-headline leading-tight">{exam.subjectName}</h2>
+            <p class="font-mono text-sm text-outline mt-1">
+              TARGET: {exam.examDateDisplay}
+            </p>
+          </div>
 
-        {/* Countdown or status display */}
-        <div class="mt-6 countdown-wrapper">
-          {/* simplyCountdown target — used for active exams */}
-          <div
-            class={`countdown-${exam.id} exam-countdown font-mono text-4xl font-black`}
-          ></div>
-          {/* Status label for TODAY / MISSED states */}
-          <div class="status-label hidden font-mono text-3xl font-black tracking-tighter"></div>
+          {/* Countdown or status display */}
+          <div class="mt-6 countdown-wrapper">
+            {/* simplyCountdown target — used for active exams */}
+            <div
+              class={`countdown-${exam.id} exam-countdown font-mono text-4xl font-black`}
+            ></div>
+            {/* Status label for TODAY / MISSED states */}
+            <div class="status-label hidden font-mono text-3xl font-black tracking-tighter"></div>
+          </div>
         </div>
       </div>
-    </div>
-  ))}
+    );
+  })}
 </div>
 
 <!-- simplyCountdown vendor library (public/simplyCountdown.min.js) -->
