@@ -273,16 +273,15 @@ function ActiveCard({
               weightClass={state === 'approaching' ? 'font-bold' : 'font-black'}
             />
           </div>
-          {/* CRITICAL: REVIEW_DATA action button */}
+          {/* CRITICAL: REVIEW_DATA label — decorative affordance, no action in static app */}
           {state === 'critical' && (
             <div className="mt-6 flex justify-end">
-              <button
-                type="button"
-                aria-label="Review exam data"
-                className="bg-primary text-on-primary-fixed px-6 py-2 font-black uppercase text-sm border-4 border-black active:translate-x-1 active:translate-y-1 active:shadow-none transition-none"
+              <div
+                aria-hidden="true"
+                className="bg-primary text-on-primary-fixed px-6 py-2 font-black uppercase text-sm border-4 border-black"
               >
                 REVIEW_DATA
-              </button>
+              </div>
             </div>
           )}
           {/* APPROACHING: progress rail */}
