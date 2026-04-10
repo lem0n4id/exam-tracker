@@ -6,9 +6,9 @@
  * visual variant based on the evaluated urgency state:
  *   - today      Inverted black card, COMMENCING_NOW status
  *   - missed     Muted grayscale card, no countdown
- *   - last24     Error-red card, segmented countdown with animate-pulse colons
- *   - critical   Primary-pink card, countdown with smaller seconds
- *   - approaching Secondary-cyan card, countdown with smaller seconds
+ *   - last24     Error-red card, segmented countdown with animate-pulse colons + urgency rail
+ *   - critical   Primary-pink card, countdown with smaller seconds + REVIEW_DATA action
+ *   - approaching Secondary-cyan card, countdown with smaller seconds + progress rail
  *   - far        Muted outline card, countdown with smaller seconds
  *
  * Visual source of truth:
@@ -120,13 +120,15 @@ function InlineCountdown({
   colorClass,
   sizeClass,
   secondsSizeClass,
+  weightClass = 'font-black',
 }: CountdownDisplayProps & {
   colorClass: string;
   sizeClass: string;
   secondsSizeClass: string;
+  weightClass?: string;
 }) {
   return (
-    <div className={`font-mono ${sizeClass} font-black ${colorClass} tracking-tighter`}>
+    <div className={`font-mono ${sizeClass} ${weightClass} ${colorClass} tracking-tighter`}>
       {pad(days)}:{pad(hours)}:{pad(minutes)}
       <span className={secondsSizeClass}>:{pad(seconds)}</span>
     </div>
@@ -239,25 +241,67 @@ function ActiveCard({
 
       {/* Countdown display */}
       {state === 'last24' ? (
-        <Last24Countdown days={days} hours={hours} minutes={minutes} seconds={seconds} />
+        <>
+          <Last24Countdown days={days} hours={hours} minutes={minutes} seconds={seconds} />
+          {/* Segmented urgency indicator — 5 blocks, first 3 filled with error */}
+          <div className="mt-4 flex gap-2">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className={`h-4 flex-1 border-2 border-black ${i < 3 ? 'bg-error' : 'bg-surface'}`}
+              />
+            ))}
+          </div>
+        </>
       ) : (
-        <div className={state === 'critical' ? 'mt-8 border-t-4 border-outline pt-4' : 'mt-8'}>
-          <InlineCountdown
-            days={days}
-            hours={hours}
-            minutes={minutes}
-            seconds={seconds}
-            colorClass={
-              state === 'critical'
-                ? 'text-primary'
-                : state === 'approaching'
-                  ? 'text-secondary'
-                  : 'text-on-surface-variant'
-            }
-            sizeClass={state === 'critical' ? 'text-5xl' : 'text-4xl'}
-            secondsSizeClass={state === 'critical' ? 'text-xl' : 'text-lg'}
-          />
-        </div>
+        <>
+          <div className={state === 'critical' ? 'mt-8 border-t-4 border-outline pt-4' : 'mt-8'}>
+            <InlineCountdown
+              days={days}
+              hours={hours}
+              minutes={minutes}
+              seconds={seconds}
+              colorClass={
+                state === 'critical'
+                  ? 'text-primary'
+                  : state === 'approaching'
+                    ? 'text-secondary'
+                    : 'text-on-surface-variant'
+              }
+              sizeClass={state === 'critical' ? 'text-5xl' : 'text-4xl'}
+              secondsSizeClass={state === 'critical' ? 'text-xl' : 'text-lg'}
+              weightClass={state === 'approaching' ? 'font-bold' : 'font-black'}
+            />
+          </div>
+          {/* CRITICAL: REVIEW_DATA action button */}
+          {state === 'critical' && (
+            <div className="mt-6 flex justify-end">
+              <button
+                type="button"
+                aria-label="Review exam data"
+                className="bg-primary text-on-primary-fixed px-6 py-2 font-black uppercase text-sm border-4 border-black active:translate-x-1 active:translate-y-1 active:shadow-none transition-none"
+              >
+                REVIEW_DATA
+              </button>
+            </div>
+          )}
+          {/* APPROACHING: progress rail */}
+          {state === 'approaching' && (
+            <div
+              role="progressbar"
+              aria-label="Study progress"
+              aria-valuenow={exam.optionalProgressRatio ?? 0}
+              aria-valuemin={0}
+              aria-valuemax={1}
+              className="mt-4 w-full bg-surface-container-highest h-2 border-2 border-black overflow-hidden"
+            >
+              <div
+                className="bg-secondary h-full"
+                style={{ width: `${(exam.optionalProgressRatio ?? 0) * 100}%` }}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );

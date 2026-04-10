@@ -94,6 +94,8 @@ export interface Exam {
  * category exists — the runtime urgency engine in Schedule.astro recomputes
  * the live AccentState from `examDateISO` on each page load, so the rendered
  * card always reflects the current band regardless of this seed value.
+ * Stochastic Processes carries an `optionalProgressRatio` of 0.33, matching
+ * the ~1/3 progress shown in the Stitch visual reference for the approaching state.
  */
 export const EXAMS: readonly Exam[] = [
   {
@@ -123,6 +125,7 @@ export const EXAMS: readonly Exam[] = [
     examDateISO: '2026-05-19',
     examDateDisplay: '19-05-2026',
     accentState: 'far',
+    optionalProgressRatio: 0.33,
   },
   {
     id: 'exam-5',
