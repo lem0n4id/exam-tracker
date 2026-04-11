@@ -40,17 +40,18 @@ Edit this file at the start of each deployment cycle to update exam dates.
 | `"today"`     | Exam day                 | delta = 0                                                          |
 | `"missed"`    | Past exam                | delta < 0                                                          |
 
-> **Note:** The runtime urgency engine in `Schedule.astro` recomputes the live state from
-> `examDateISO` on every page load, so the card display stays accurate even if `accentState`
-> drifts from the live date. `accentState` in the data array documents the expected state at
-> deployment time.
+> **Note:** The runtime urgency engine (`src/lib/countdown.ts`, consumed by the `useCountdown`
+> hook in `src/hooks/useCountdown.ts`) recomputes the live state from `examDateISO` on every
+> page load, so the card display stays accurate even if `accentState` drifts from the live date.
+> `accentState` in the data array documents the expected state at deployment time.
 
 ---
 
 ### UI-Impact Mapping
 
 The following table maps `AccentState` values to the visual treatment applied by
-the client-side urgency engine (see the `<script>` block in `src/components/Schedule.astro`).
+the client-side urgency engine (`src/lib/countdown.ts`, consumed via `src/hooks/useCountdown.ts`
+inside `src/components/ExamCard.tsx`).
 The **Stitch reference** column shows which card in
 `stitch/2944944676816621264/668a3253350e441690c92f6971809c95/Exam-Tracker-Deadline-Machine.html`
 demonstrates each state.
@@ -119,6 +120,44 @@ console.log('All exam records are valid.');
 ## Architecture Notes
 
 - **No backend, no auth, no persistence.** All data is hardcoded in `src/data/exams.ts`.
-- The countdown is computed client-side via `public/simplyCountdown.min.js` (do NOT replace).
+- The countdown engine is implemented in `src/lib/countdown.ts` (pure logic) and consumed by
+  the `useCountdown` React hook in `src/hooks/useCountdown.ts`. No third-party timer vendor library is used.
 - Design tokens live in `src/styles/global.css` (`@theme` directive, Tailwind v4).
 - Visual source of truth: `stitch/2944944676816621264/668a3253350e441690c92f6971809c95/Exam-Tracker-Deadline-Machine.html`.
+
+---
+
+## Stitch Parity: TODAY and MISSED Override States
+
+The following table documents the verified parity between the component implementations
+in `src/components/ExamCard.tsx` and the reference treatments in
+`stitch/2944944676816621264/668a3253350e441690c92f6971809c95/Exam-Tracker-Deadline-Machine.html`
+(Card 4 — Linear Algebra for TODAY; Card 5 — Calculus III for MISSED).
+
+### TODAY card (`TodayCard` component)
+
+| Element              | Stitch reference classes                                    | Implementation classes                                       | Match |
+|----------------------|-------------------------------------------------------------|--------------------------------------------------------------|-------|
+| Card wrapper         | `relative bg-on-surface text-surface p-6 border-4 border-on-surface` | same | ✅ |
+| Floating badge       | `absolute -top-6 left-4 bg-error text-on-error px-4 py-1 font-black text-xl border-4 border-on-surface` | same | ✅ |
+| Subject heading      | `text-3xl font-black font-headline leading-none mb-2`       | same (+ `uppercase` for design consistency)                  | ✅ |
+| Date / warning row   | `flex justify-between items-center`                         | same                                                         | ✅ |
+| Date span            | `font-mono text-lg font-bold`                               | same                                                         | ✅ |
+| Warning icon         | `material-symbols-outlined text-4xl` + FILL variant setting | same + `aria-hidden="true"`                                  | ✅ |
+| COMMENCING_NOW block | `mt-6 bg-surface text-on-surface p-4 border-4 border-on-surface` | same                                                    | ✅ |
+| COMMENCING_NOW text  | `text-center font-mono text-4xl font-black tracking-tighter` | same                                                        | ✅ |
+| Live timer           | *(absent — replaced by COMMENCING_NOW)*                     | No interval registered (`useCountdown` skips for `today`)    | ✅ |
+
+### MISSED card (`MissedCard` component)
+
+| Element          | Stitch reference classes                                    | Implementation classes                                         | Match |
+|------------------|-------------------------------------------------------------|----------------------------------------------------------------|-------|
+| Card wrapper     | `bg-surface-container-low border-4 border-outline p-6 opacity-60 grayscale` | same                               | ✅ |
+| Header row       | `flex justify-between items-start mb-4`                     | same                                                           | ✅ |
+| Subject heading  | `text-2xl font-black font-headline leading-tight text-outline` | same (+ `uppercase` for design consistency)                  | ✅ |
+| MISSED badge     | `bg-outline text-surface px-2 py-1 font-black text-xs`      | same                                                           | ✅ |
+| Footer row       | `flex justify-between items-end`                            | same                                                           | ✅ |
+| Date label       | `font-mono text-sm text-outline`  (prefix `DATE:`)          | same                                                           | ✅ |
+| event_busy icon  | `material-symbols-outlined text-outline`                    | same + `aria-hidden="true"`                                    | ✅ |
+| Countdown timer  | *(absent — card is static)*                                 | No interval registered (`useCountdown` skips for `missed`)     | ✅ |
+| Animations       | *(none)*                                                    | No `animate-*` classes; `useCountdown` suppresses ticking      | ✅ |
