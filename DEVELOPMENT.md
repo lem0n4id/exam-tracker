@@ -40,17 +40,18 @@ Edit this file at the start of each deployment cycle to update exam dates.
 | `"today"`     | Exam day                 | delta = 0                                                          |
 | `"missed"`    | Past exam                | delta < 0                                                          |
 
-> **Note:** The runtime urgency engine in `Schedule.astro` recomputes the live state from
-> `examDateISO` on every page load, so the card display stays accurate even if `accentState`
-> drifts from the live date. `accentState` in the data array documents the expected state at
-> deployment time.
+> **Note:** The runtime urgency engine (`src/lib/countdown.ts`, consumed by the `useCountdown`
+> hook in `src/hooks/useCountdown.ts`) recomputes the live state from `examDateISO` on every
+> page load, so the card display stays accurate even if `accentState` drifts from the live date.
+> `accentState` in the data array documents the expected state at deployment time.
 
 ---
 
 ### UI-Impact Mapping
 
 The following table maps `AccentState` values to the visual treatment applied by
-the client-side urgency engine (see the `<script>` block in `src/components/Schedule.astro`).
+the client-side urgency engine (`src/lib/countdown.ts`, consumed via `src/hooks/useCountdown.ts`
+inside `src/components/ExamCard.tsx`).
 The **Stitch reference** column shows which card in
 `stitch/2944944676816621264/668a3253350e441690c92f6971809c95/Exam-Tracker-Deadline-Machine.html`
 demonstrates each state.
