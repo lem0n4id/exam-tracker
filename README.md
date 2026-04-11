@@ -103,6 +103,20 @@ before every release. It includes:
 - Fixed-element overlap checks
 - Evidence report template
 
+### Release Operations
+
+Every cycle deployment follows the playbook in
+[docs/release/playbook.md](docs/release/playbook.md). The playbook defines five sequential
+phases: Pre-Check → Data Update → Verify → Approve → Publish, with an explicit rollback path.
+
+When opening a release PR, copy and complete the
+[Handoff Template](docs/release/handoff-template.md) into the PR body. The template captures:
+
+- Pre-release checklist evidence (build, visual parity gate, QA report)
+- Data update summary (changed subjects and date range)
+- Known risks and mitigations
+- Reviewer sign-off and rollback plan
+
 ---
 
 ## GitHub Agent Execution Order
