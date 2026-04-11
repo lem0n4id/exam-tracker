@@ -112,6 +112,21 @@ That document covers:
 
 ---
 
+### Release Playbook
+
+For every cycle deployment, follow the step-by-step release playbook:
+[docs/release/playbook.md](docs/release/playbook.md).
+
+It defines five sequential phases — Pre-Check, Data Update, Verify, Approve, Publish — with an
+explicit rollback path and sign-off gate. The visual parity gate in Phase 3 requires comparison
+against the Stitch baseline:
+`stitch/2944944676816621264/668a3253350e441690c92f6971809c95/Exam-Tracker-Deadline-Machine.html`.
+
+When opening a release PR, copy and complete the
+[Handoff Template](docs/release/handoff-template.md) into the PR body.
+
+---
+
 ### Updating Exam Data for a New Cycle
 
 1. Open `src/data/exams.ts`.
