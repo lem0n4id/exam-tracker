@@ -98,6 +98,20 @@ console.log('All exam records are valid.');
 
 ---
 
+### Visual Regression and Responsive QA
+
+Before every release, run the full visual parity and responsive QA workflow documented in
+[docs/qa/visual-regression-responsive-qa.md](docs/qa/visual-regression-responsive-qa.md).
+
+That document covers:
+- Visual parity checklist for every urgency state against the Stitch reference
+- Responsive viewport matrix (320 px, 375 px, 768 px, 1280 px)
+- Fixed-element overlap checks (top bar + bottom nav)
+- PRD traceability mapping
+- Evidence report template for sign-off
+
+---
+
 ### Updating Exam Data for a New Cycle
 
 1. Open `src/data/exams.ts`.

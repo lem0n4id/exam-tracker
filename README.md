@@ -93,6 +93,16 @@ Date format for all displays: **DD-MM-YYYY** (`examDateDisplay` field).
 `stitch/2944944676816621264/668a3253350e441690c92f6971809c95/Exam-Tracker-Deadline-Machine.html`
 is the authoritative visual source of truth for all UI implementation decisions.
 
+### Visual Regression and Responsive QA
+
+Run the QA workflow in [docs/qa/visual-regression-responsive-qa.md](docs/qa/visual-regression-responsive-qa.md)
+before every release. It includes:
+
+- Visual parity checklist (all urgency states vs. Stitch reference)
+- Responsive viewport matrix (320 px → 1280 px)
+- Fixed-element overlap checks
+- Evidence report template
+
 ---
 
 ## GitHub Agent Execution Order
